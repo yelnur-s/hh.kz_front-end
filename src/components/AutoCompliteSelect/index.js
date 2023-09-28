@@ -42,7 +42,7 @@ export default function AutoCompliteSelect({label, placeholder, type, size, item
                 <span>{value.name}</span> <i onClick={reset}>X</i>
             </div>}
             {filteredItems.length > 0 && <div className="dropdown">
-                {filteredItems.map(item => (<a onClick={() => onClick(item)}>{item.name}</a>))}
+                {filteredItems.map(item => (<a key={item.id} onClick={() => onClick(item)}>{item.name}</a>))}
             </div>}
         </div>
     )

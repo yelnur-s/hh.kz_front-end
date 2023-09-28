@@ -32,7 +32,7 @@ export default function ModalSelectExp({close, onChange, value}) {
                 <h2>Кого вы хотите найти</h2>
                 <input className="input" type="text" value={search} onChange={onSearch} placeholder="Искать"/>
                 
-                {filteredSpecTypes.map(specType=> (<SpecType specType={specType} onChange={onChange} value={value}/>))}
+                {filteredSpecTypes.map(specType=> (<SpecType specType={specType} key={specType.id} onChange={onChange} value={value}/>))}
             </div>
         </div>
     )

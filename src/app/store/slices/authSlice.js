@@ -3,7 +3,6 @@ import axios from 'axios'
 import jwt_decode from "jwt-decode"
 
 import { END_POINT } from '@/conifig/end-point'
-const token = localStorage.getItem("token")
 
 let initialState = {
   isAuth: false,
@@ -12,26 +11,6 @@ let initialState = {
   error: null
 }
 
-if(token) {
-  let decodedToken = jwt_decode(token)
-  if(decodedToken.exp * 1000 > Date.now()) {
-    initialState = {
-      isAuth: true,
-      currentUser: {
-        id: decodedToken.id,
-        email: decodedToken.email,
-        full_name: decodedToken.full_name,
-        phone: decodedToken.phone,
-        role: decodedToken.role,
-      },
-      tokenExt: decodedToken.exp
-    }
-    console.log(initialState)
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-  } else {
-    localStorage.removeItem("token")
-  }
-}
 
 
 
@@ -57,11 +36,19 @@ export const authSlice = createSlice({
 
       state.tokenExt = decoded.exp
     },
-    logOut: (state) => {
+    logOut: (state, action) => {
+      const role = {...state.currentUser.role}
       state.isAuth = false
+
       state.currentUser = null;
       state.exp = 0;
       localStorage.removeItem("token")
+
+      if(role.name === "employee") {
+        action.payload.push("/login")
+      } else {
+        action.payload.push("/employer/signin")
+      }
     },
     setError: (state, action) => {
       state.error = action.payload

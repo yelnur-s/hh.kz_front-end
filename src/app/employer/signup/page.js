@@ -69,7 +69,7 @@ export default function EmployerSignup() {
                     <input className="input" placeholder="Введите email" value={email} onChange={(e)=>setEmail(e.target.value)} />
                     <button className="button button-primary" onClick={()=>setStep(2)}>Продолжить</button>
                 </form>
-                {error && Object.keys(error).map(key => (<p className="error"> { error[key] }</p>))}
+                {error && Object.keys(error).map(key => (<p key={key} className="error"> { error[key] }</p>))}
             </div>}
 
             {step === 2 &&<div className="card">
@@ -80,7 +80,7 @@ export default function EmployerSignup() {
                     <button className="button button-primary" onClick={()=>setStep(3)} type="button">Продолжить</button>
                     <button className="button button-primary-bordered" onClick={()=>setStep(1)}>Назад</button>
                 </form>
-                {error && Object.keys(error).map(key => (<p className="error"> { error[key] }</p>))}
+                {error && Object.keys(error).map(key => (<p key={key} className="error"> { error[key] }</p>))}
             </div> }
 
             {step === 3 &&<div className="card">
@@ -93,7 +93,7 @@ export default function EmployerSignup() {
                     <button className="button button-primary" onClick={()=>setStep(4)} type="button">Продолжить</button>
                     <button className="button button-primary-bordered" onClick={()=>setStep(2)}>Назад</button>
                 </form>
-                {error && Object.keys(error).map(key => (<p className="error"> { error[key] }</p>))}
+                {error && Object.keys(error).map(key => (<p key={key} className="error"> { error[key] }</p>))}
             </div> }
 
             {step === 4 &&<div className="card">

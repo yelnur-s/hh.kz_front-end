@@ -6,7 +6,7 @@ import { END_POINT } from '@/conifig/end-point'
 
 
 export const vancancySlice = createSlice({
-  name: 'resume',
+  name: 'vacancy',
   initialState: {
     vacancies: [],
     vacancy: {},
@@ -14,10 +14,10 @@ export const vancancySlice = createSlice({
     cities: [],
     experiences: [],
     skills: [],
-    empTypes: []
+    empTypes: [],
   },
   reducers: {
-    setMyVacancies: (state, action) => {
+    setVacancies: (state, action) => {
         state.vacancies = action.payload.vacancies
     },
     setVacancy: (state, action) => {
@@ -47,13 +47,13 @@ export const vancancySlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setMyVacancies, setVacancy, handleDeleteVacancy, setSpecializations, setCities, setExps, setSkills, setEmpType } = vancancySlice.actions
+export const { setVacancies, setVacancy, handleDeleteVacancy, setSpecializations, setCities, setExps, setSkills, setEmpType } = vancancySlice.actions
 
 export const getMyVacancies = () => async (dispatch) => {
     
      try {
         const res = await axios.get(`${END_POINT}/api/vacancy`);
-        dispatch(setMyVacancies({vacancies: res.data}))
+        dispatch(setVacancies({vacancies: res.data}))
      }catch(e) {
         alert("Что то пошло не так, сообщите о ошибке Тех спецам сайта!")
      }
@@ -138,18 +138,50 @@ export const deleteVacancy = (id) => async (dispatch) => {
 }
 
 
-//   export const getResumeById = (id) => async (dispatch) => {
+  export const getVacancyById = (id) => async (dispatch) => {
     
-//    try {
-//       const res = await axios.get(`${END_POINT}/api/resume/${id}`);
-//       console.log(res.data)
-//       dispatch(setResume({resume: res.data}))
-//    } catch(e) {
-//       alert("Что то пошло не так, сообщите о ошибке Тех спецам сайта!")
-//    }
+   try {
+      const res = await axios.get(`${END_POINT}/api/vacancy/${id}`);
+   
+      dispatch(setVacancy({vacancy: res.data}))
+   } catch(e) {
+      alert("Что то пошло не так, сообщите о ошибке Тех спецам сайта!")
+   }
   
-// }
+}
 
+
+export const getSearchedVacancies = (params, router) => async (dispatch) => {
+    
+   try {
+      const {
+         q,
+         specializationId,
+         cityId,
+         experienceId,
+         employmentTypeId,
+         salary,
+         salary_type
+     } = params;
+
+      let queryString = "?"
+      if(q) queryString +=`q=${q}&`
+      if(specializationId) queryString +=`specializationId=${specializationId}&`
+      if(cityId) queryString +=`cityId=${cityId}&`
+      if(salary) queryString +=`salary=${salary}&`
+      if(salary_type) queryString +=`salary_type=${salary_type}&`
+      if(experienceId) queryString +=`experienceId=${experienceId}&`
+      if(employmentTypeId) queryString +=`employmentTypeId=${employmentTypeId}&`
+
+      router.push(`/search/vacancy${queryString}`)
+
+      const res = await axios.get(`${END_POINT}/api/vacancy/search${queryString}`);
+      dispatch(setVacancies({vacancies: res.data}))
+   }catch(e) {
+      alert("Что то пошло не так, сообщите о ошибке Тех спецам сайта!")
+   }
+  
+}
 
 
 // export const editResume = (sendData, router) => async (dispatch) => {

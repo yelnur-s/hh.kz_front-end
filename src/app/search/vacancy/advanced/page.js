@@ -1,28 +1,23 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react"
 import Header from "@/components/header"
 import { useDispatch, useSelector } from "react-redux"
-import { getSpecializations, getCities, getExperiences, getSkills, getEmpType, createVacancy } from "@/app/store/slices/vacancySlice"
+import { getSpecializations, getCities, getExperiences, getSkills, getEmpType } from "@/app/store/slices/vacancySlice"
 import ModalSelectSpec from '@/components/ModalSelectSpec'
 import AutoCompliteSelect from '@/components/AutoCompliteSelect'
-import AutoCompliteTags from "@/components/AutoCompliteTags"
-import { useRouter } from "next/navigation"
-import dynamic from "next/dynamic"
-export default function CreateVacancy() {
 
-    const [name, setName] = useState("")
+import { useRouter } from "next/navigation"
+export default function SearchVacancyAdvanced() {
+    const [q, setQ] = useState("")
     const [specializationId, setSpecialization] = useState()
     const [specializationName, setSpecializationName] = useState()
     const [isSpecModalOpen, setSpecModalOpen] = useState(false)
     const [cityId, setCity] = useState()
-    const [salary_from, setSalaryFrom] = useState("")
-    const [salary_to, setSalaryTo] =useState("")
+    const [salary, setSalary] = useState("")
     const [salary_type, setSalaryType] = useState("KZT")
-    const [address, setAddress] = useState()
     const [experienceId, setExperienceId] = useState()
-    const [description, setDescription] =useState("<h2>Обязаности</h2> <ul><li></li><li></li></ul><h2>Требования</h2> <ul><li></li><li></li></ul><h2>Условия</h2> <ul><li></li><li></li></ul>")
-    const [skills, setSelectedSkills] = useState([])
     const [employmentTypeId, setEmploymentType] = useState()
+
 
     const router = useRouter()
     const dispatch = useDispatch()
@@ -46,49 +41,37 @@ export default function CreateVacancy() {
 
     const cities = useSelector(state=>state.vacancy.cities)
     const experiences = useSelector(state=>state.vacancy.experiences)
-    const allSkills = useSelector(state=>state.vacancy.skills)
     const empTypes = useSelector(state=>state.vacancy.empTypes)
 
-    
+
     const handleChangeExp = e => {
         setExperienceId(e.target.value)
     }
 
-    const onSkillsChange = (data) => {
-        const arr = data.map(item => item.name) 
-        setSelectedSkills(arr.join(","))
-      }
 
-      const handleSave = () => {
-        console.log(specializationId)
-        dispatch(createVacancy({
-            name,
-            specializationId: `${specializationId}`,
-            cityId: `${cityId}`,
-            description,
-            employmentTypeId,
-            salary_from: salary_from*1,
-            salary_to: salary_to * 1,
-            salary_type,
-            address,
-            experienceId,
-            skills,
-            about_company: ""
-        }, router))
-      }
+      const handleSearch = () => {
+        let queryString = "?"
 
-    const Editor = dynamic(() => import("./editor"), { ssr: false });
+        if(q) queryString +=`q=${q}&`
+        if(specializationId) queryString +=`specializationId=${specializationId}&`
+        if(cityId) queryString +=`cityId=${cityId}&`
+        if(salary) queryString +=`salary=${salary}&`
+        if(salary_type) queryString +=`salary_type=${salary_type}&`
+        if(experienceId) queryString +=`experienceId=${experienceId}&`
+        if(employmentTypeId) queryString +=`employmentTypeId=${employmentTypeId}&`
+
+        router.push(`/search/vacancy${queryString}`)
+      }
   
     return (
         <main>
             <Header />
             <div className="container p7">
-                <h1>Создание вакансии</h1>
+                <h1>Поиск вакансии</h1>
 
-                <h2>Основная информация</h2>
                 <fieldset className="fieldset-vertical">
-                    <label>Название вакансии</label>
-                    <input className="input" placeholder="Название" type="text" value={name} onChange={(e)=>setName(e.target.value)}/>
+                    <label> Ключевые слова </label>
+                    <input className="input" placeholder="Название" type="text" value={q} onChange={(e)=>setQ(e.target.value)}/>
                 </fieldset>
 
                 <fieldset className="fieldset-vertical">
@@ -103,8 +86,8 @@ export default function CreateVacancy() {
                 <fieldset className="fieldset-vertical fieldset-md">
                     <label>Предполагаемый уровень дохода в месяц</label>
                     <div className="input-group">
-                        <input className="input" placeholder="От" type="text" value={salary_from} onChange={(e)=>setSalaryFrom(e.target.value)}/>
-                        <input className="input" placeholder="До" type="text" value={salary_to} onChange={(e)=>setSalaryTo(e.target.value)}/>
+                        <input className="input" placeholder="От" type="text" value={salary} onChange={(e)=>setSalary(e.target.value)}/>
+                    
                         <select className="input" name="salary_type" value={salary_type} onChange={e=>setSalaryType(e.target.value)}>
                             <option value={"KZT"}>KZT</option>
                             <option value={"USD"}>USD</option>
@@ -114,11 +97,7 @@ export default function CreateVacancy() {
                     
                 </fieldset>
 
-                <fieldset className="fieldset-vertical">
-                    <label>Адрес</label>
-                    <input className="input" placeholder="Введите адрес" type="text" value={address} onChange={(e)=>setAddress(e.target.value)}/>
-                </fieldset>
-
+   
 
                 <fieldset className="fieldset-vertical fieldset-md">
                     <label>Опыт работы</label>
@@ -133,21 +112,10 @@ export default function CreateVacancy() {
                 </fieldset>
 
                 <fieldset className="fieldset-vertical fieldset-md">
-                    <label>Расскажите про вакансию</label>
-                    <div>
-                        <Editor description={description} setDescription={setDescription}/>
-                    </div>
-                    
-                </fieldset>
-
-
-                <AutoCompliteTags placeholder="" type="text" label="Ключевые навыки" size="fieldset-md fieldset-vertical" items={allSkills} onSelect={onSkillsChange} selected={skills.length > 0 ? skills.split(",").map(item=> ({name: item})) : []}/>
-                
-                <fieldset className="fieldset-vertical fieldset-md">
                     <label>Тип занятости</label>
                     <div>
                         {empTypes.map(et => <div className="radio" key={et.id}>
-                            <input type="radio" value={et.id} name="exp" onChange={(e) => setEmploymentType(e.target.value)}/>
+                            <input type="radio" value={et.id} name="empType" onChange={(e) => setEmploymentType(e.target.value)}/>
                             <label>{et.name}</label>
                         </div>)}
 
@@ -155,7 +123,7 @@ export default function CreateVacancy() {
                     
                 </fieldset>
 
-                <button className="button button-primary" onClick={handleSave}>Создать</button>
+                <button className="button button-primary" onClick={handleSearch}>Поиск</button>
             </div>
         </main>
     )
