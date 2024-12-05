@@ -5,6 +5,8 @@ export default function MyVacancies () {
 
 
     const vacancies = useSelector((state) => state.vacancy.vacancies) 
+
+    
     const showVacancies = vacancies.map(item => 
         (<MyVacancy item={item}
                    key={item.id}

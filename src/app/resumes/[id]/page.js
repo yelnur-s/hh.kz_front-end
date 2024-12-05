@@ -3,24 +3,34 @@
 import Header from '@/components/header'
 import MyResumes from '@/components/myresumes'
 import Link from 'next/link'
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {getResumeById} from '@/app/store/slices/resumeSlice'
+import {getResumeById, setLoadingTrue} from '@/app/store/slices/resumeSlice'
 import { useParams } from 'next/navigation';
+
 import {getAgeFromBirthday, monthsInRussian, monthsInRussian2} from '@/app/utils/format'
 
 export default function ResumePage() {
 
   const dispatch = useDispatch();
   const {id} = useParams();
+  // const [loading, setLoading] = useState(true)
   const resume = useSelector(state => state.resume.resume)
+  const isLoading = useSelector(state => state.resume.isLoading)
   const didMount = () => {
     dispatch(getResumeById(id))
+
+    return () => {
+      dispatch(setLoadingTrue())
+    }
   }
 
   console.log("in page", resume)
 
   useEffect(didMount, [])
+  // useEffect(() => {
+  //   setLoading(isLoading)
+  // }, [isLoading])
   
 
   const age = getAgeFromBirthday(resume.birthday)
@@ -42,7 +52,8 @@ export default function ResumePage() {
   return (
     <main>
       <Header />
-      <div className="container">
+      {isLoading && <span>Loading</span>}
+      {!isLoading && <div className="container">
         <div className="flex flex-ai-c flex-jc-sb ptb7">
             <Link className='link' href="/resumes">К списку резюме</Link>
             <Link className="button button-secondary-bordered" href={`/edit-resume/${resume.id}`}>Редактировать</Link>
@@ -119,7 +130,7 @@ export default function ResumePage() {
     <h3>Гразжданство</h3>
 
     <p>{resume.citizenshipObj && resume.citizenshipObj.name}</p>
-      </div>
+      </div>}
     </main>
   )
 }

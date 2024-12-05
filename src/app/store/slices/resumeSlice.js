@@ -9,7 +9,8 @@ export const resumeSlice = createSlice({
   name: 'resume',
   initialState: {
     resumes: [],
-    resume: {}
+    resume: {},
+    isLoading: true,
   },
   reducers: {
     setMyResumes: (state, action) => {
@@ -25,12 +26,18 @@ export const resumeSlice = createSlice({
       let resumes = [...state.resumes]
       resumes = resumes.filter(item => item.id !== action.payload)
       state.resumes = resumes
-    }
+    },
+    setLoadingFalse: (state, action) => {
+      state.isLoading = false
+    },
+    setLoadingTrue: (state, action) => {
+      state.isLoading = true
+    },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setMyResumes, uppendResume, setResume, handleDeleteResume } = resumeSlice.actions
+export const { setLoadingTrue, setMyResumes, uppendResume, setResume, handleDeleteResume, setLoadingFalse } = resumeSlice.actions
 
 export const getMyResumes = () => async (dispatch) => {
     
@@ -45,11 +52,11 @@ export const getMyResumes = () => async (dispatch) => {
   }
 
   export const getResumeById = (id) => async (dispatch) => {
-    
    try {
       const res = await axios.get(`${END_POINT}/api/resume/${id}`);
       console.log(res.data)
       dispatch(setResume({resume: res.data}))
+      dispatch(setLoadingFalse())
    } catch(e) {
       alert("Что то пошло не так, сообщите о ошибке Тех спецам сайта!")
    }
